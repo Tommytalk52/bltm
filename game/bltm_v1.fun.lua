@@ -1523,7 +1523,7 @@ local default_legend={
 
 -- items not tiles, so display tile 0 and we will add a sprite for display
 	["N1"]={ 	npc="npc1",  },
-	["b"]={		bird="bird",  },
+	["b "]={		bird="bird",  },
 }
 	
 levels={}
