@@ -1306,6 +1306,130 @@ add=function(opts)
 end,
 }
 
+
+-----------------------------------------------------------------------------
+--[[#entities.systems.birdie
+
+	donut = entities.systems.birdie.add(opts)
+
+Add a bird.
+
+]]
+-----------------------------------------------------------------------------
+entities.systems.bird={
+
+load=function() graphics.loads{
+
+-- 1 x 24x24
+{nil,"bird_1",[[
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . b . . . . . . . . . . 
+. . . . . . . . . . . . b b . . . . . . . . . . 
+. . . . . . . . . . b b b b . . . . . . . . . . 
+. . . . . . . . b b b b . . . . . . . . . . . . 
+. . . . . b b b b b b b . . . . . . . . . . . . 
+. . . . . Y . . . . . Y . . . . . . . . . . . .
+. . . . . Y . . . . . Y . . . . . . . . . . . . 
+. . . . Y Y Y . . . Y Y Y . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+]]},
+
+}end,
+
+space=function()
+
+end,
+
+spawn=function(count)
+	
+end,
+
+add=function(opts)
+
+	local names=system.components.tiles.names
+	local space=entities.get("space")
+
+	local bird=entities.add{caste="bird"}
+
+	bird.frame=0
+	bird.frames={ names.bird_1.idx+0 }
+		
+	bird.update=function()
+	end
+	
+	bird.draw=function()
+		if bird.active then
+			local px,py=bird.body:position()
+			local rz=bird.body:angle()
+			local t=bird.frames[1]
+			system.components.sprites.list_add({t=t,h=8,px=px,py=py,rz=180*rz/math.pi})			
+		end
+	end
+	bird.active=true
+	
+	bird.body=space:body(1,1)
+	bird.body:position(opts.px,opts.py)
+--	bird.body:velocity(opts.vx,opts.vy)
+	
+
+	bird.shape=bird.body:shape("circle",4,0,0)
+	bird.shape:friction(1)
+	bird.shape:elasticity(0)
+	bird.shape:collision_type(space:type("bird"))
+--	bird.shape.loot=bird
+
+	return bird
+end,
+}
+
+----------------------------------------------------------------------------
+--[[#entities.tiles.start
+
+The player start point, just save the x,y
+
+]]
+-----------------------------------------------------------------------------
+entities.tiles.start=function(tile)
+	entities.set("players_start",{tile.x*8+4,tile.y*8+4}) --  remember start point
+end
+
+-----------------------------------------------------------------------------
+--[[#entities.tiles.sprite
+
+Display a sprite
+
+]]
+-----------------------------------------------------------------------------
+entities.tiles.sprite=function(tile)
+
+	local names=system.components.tiles.names
+
+	local item=entities.systems.item.add()
+	item.active=true
+	item.px=tile.x*8+4
+	item.py=tile.y*8+4
+	item.sprite = names[tile.sprite].idx
+	item.h=24
+	item.s=1
+	item.draw_rz=0
+	item.pz=-1
+end
+}
+
 ----------------------------------------------------------------------------
 --[[#entities.tiles.start
 
@@ -1399,7 +1523,7 @@ local default_legend={
 
 -- items not tiles, so display tile 0 and we will add a sprite for display
 	["N1"]={ 	npc="npc1",  },
-
+	["b"]={		bird="bird",  },
 }
 	
 levels={}
@@ -1422,7 +1546,7 @@ map=[[
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
-||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
+||. . . . . . . . . b b b b b b b b b b b b b b b b b b b b b b b b b b b . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
@@ -1436,7 +1560,7 @@ map=[[
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||,,. . . . . . ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,. . . . . ||
 ||==. . . . . . ====================================================. . . . . ||
-||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . N1. . ||
+||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ||
 ||============================================================================||
 ||0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ||
