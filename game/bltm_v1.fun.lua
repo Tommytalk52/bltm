@@ -1428,7 +1428,7 @@ entities.tiles.sprite=function(tile)
 	item.draw_rz=0
 	item.pz=-1
 end
-}
+
 
 ----------------------------------------------------------------------------
 --[[#entities.tiles.start
